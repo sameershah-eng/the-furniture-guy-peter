@@ -20,6 +20,7 @@ import { formatPrice, calculateKlarna3 } from '../utils/formatPrice';
 import { useStore } from '../store/useStore';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { ProductCard } from '../components/ProductCard';
+import { SmartImage } from '../components/SmartImage';
 
 export const Product: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -81,6 +82,8 @@ export const Product: React.FC = () => {
     .slice(0, 4);
 
   const productReviews = reviews.slice(0, 3);
+  const currentImage = product.images[activeImageIndex] || product.images[0];
+  const otherImages = product.images.filter((_, i) => i !== activeImageIndex);
 
   return (
     <div className="bg-black text-white min-h-screen pt-24 pb-24">
@@ -95,14 +98,20 @@ export const Product: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 space-y-16">
         {/* ================= MAIN PURCHASE MODULE ================= */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Left Column: Image Gallery */}
+          {/* Left Column: Image Gallery (4:5 fixed ratio) */}
           <div className="lg:col-span-7 space-y-4 lg:sticky lg:top-28">
             {/* Primary Main Image with Zoom Effect */}
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-900 border-2 border-white/10 group shadow-2xl">
-              <img
-                src={product.images[activeImageIndex] || product.images[0]}
+            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-neutral-900 border-2 border-white/10 group shadow-2xl">
+              <SmartImage
+                key={currentImage}
+                src={currentImage}
                 alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                priority
+                fallbackUrls={otherImages}
+                itemTypeKeyword={product.itemTypeKey}
+                aspectRatioClass="h-full w-full"
+                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                fallbackTitle={product.name}
               />
 
               {/* Wishlist Button */}
@@ -119,7 +128,7 @@ export const Product: React.FC = () => {
               </button>
 
               {/* Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
+              <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                 {product.badges?.map((b) => (
                   <span
                     key={b}
@@ -131,19 +140,26 @@ export const Product: React.FC = () => {
               </div>
             </div>
 
-            {/* Thumbnails Row */}
+            {/* Thumbnails Row (4:5 fixed aspect ratio) */}
             <div className="grid grid-cols-4 gap-3">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`relative aspect-[4/3] rounded-xl overflow-hidden border-2 transition-all ${
+                  className={`relative aspect-[4/5] rounded-xl overflow-hidden border-2 transition-all ${
                     activeImageIndex === idx
                       ? 'border-[#FF7A00] ring-2 ring-[#FF7A00]/40 scale-102'
                       : 'border-white/15 opacity-70 hover:opacity-100 hover:border-white/40'
                   }`}
                 >
-                  <img src={img} alt={`${product.name} thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                  <SmartImage
+                    src={img}
+                    alt={`${product.name} thumbnail ${idx + 1}`}
+                    itemTypeKeyword={product.itemTypeKey}
+                    lockIndex={idx + 10}
+                    aspectRatioClass="h-full w-full"
+                    className="w-full h-full object-cover object-center"
+                  />
                 </button>
               ))}
             </div>

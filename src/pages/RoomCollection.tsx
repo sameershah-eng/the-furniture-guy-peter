@@ -4,6 +4,7 @@ import { ArrowRight, Sparkles, Layers } from 'lucide-react';
 import { categories } from '../data/categories';
 import { rooms } from '../data/rooms';
 import { Breadcrumb } from '../components/Breadcrumb';
+import { SmartImage } from '../components/SmartImage';
 
 export const RoomCollection: React.FC = () => {
   const { categorySlug } = useParams<{ categorySlug: string }>();
@@ -70,23 +71,27 @@ export const RoomCollection: React.FC = () => {
 
         {/* Style Gallery Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {displayedRooms.map((room) => (
+          {displayedRooms.map((room, idx) => (
             <Link
               key={room.id}
               to={`/collections/${category.slug}/${room.slug}`}
               className="group relative rounded-2xl overflow-hidden border-2 border-white/15 hover:border-[#FF7A00] transition-all duration-300 bg-[#0D0D0D] hard-shadow flex flex-col"
             >
-              {/* Full Room Image preview */}
-              <div className="relative aspect-[16/10] overflow-hidden">
-                <img
+              {/* Full Room Image: 16:10 desktop, 4:5 mobile */}
+              <div className="relative aspect-[4/5] sm:aspect-[16/10] overflow-hidden">
+                <SmartImage
                   src={room.fullRoomImage}
                   alt={room.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  itemTypeKeyword={category.slug}
+                  lockIndex={idx + 1}
+                  priority={idx < 2}
+                  aspectRatioClass="h-full w-full"
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent pointer-events-none" />
 
                 {/* Style Chip & Hotspot badge */}
-                <div className="absolute top-4 left-4 flex gap-2">
+                <div className="absolute top-4 left-4 flex gap-2 z-10">
                   <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-black/80 backdrop-blur-md text-[#FF7A00] border border-[#FF7A00]/40 rounded-lg">
                     {room.style} Style
                   </span>

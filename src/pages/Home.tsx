@@ -7,23 +7,30 @@ import { products } from '../data/products';
 import { rooms } from '../data/rooms';
 import { reviews } from '../data/reviews';
 import { ProductCard } from '../components/ProductCard';
+import { SmartImage } from '../components/SmartImage';
 import { formatPrice } from '../utils/formatPrice';
+import { getSingleImageForType } from '../data/imageLibrary';
 
 export const Home: React.FC = () => {
   const featuredProducts = products.slice(0, 4);
   const spotlightProduct = products[0]; // Aurelia Sofa
   const featuredRoom = rooms[0]; // Modern Haven
+  const heroImage = getSingleImageForType('hero', 0);
 
   return (
     <div className="bg-black text-white min-h-screen">
       {/* 1. ELITE HERO SECTION: Full-viewport (100svh) Cinematic Luxury */}
       <section className="relative w-full h-[100svh] min-h-[680px] flex items-center justify-center overflow-hidden">
-        {/* Background Image with slow cinematic zoom */}
+        {/* Background Image with eager loading and high priority */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=85"
+            src={heroImage}
             alt="The Furniture Guy London Living Room"
-            className="w-full h-full object-cover scale-105 animate-[pulse_10s_ease-in-out_infinite]"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover object-center scale-105 animate-[pulse_10s_ease-in-out_infinite]"
           />
           {/* Gradients */}
           <div className="absolute inset-0 bg-gradient-dark-overlay" />
@@ -81,12 +88,15 @@ export const Home: React.FC = () => {
                 className="block p-4 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/20 hover:border-[#FF7A00] transition-all group shadow-2xl hover:translate-y-[-4px]"
               >
                 <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-3">
-                  <img
+                  <SmartImage
                     src={spotlightProduct.images[0]}
                     alt={spotlightProduct.name}
+                    itemTypeKeyword={spotlightProduct.itemTypeKey}
+                    aspectRatioClass="h-full w-full"
+                    priority
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider bg-black/80 text-[#FF7A00] rounded">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider bg-black/80 text-[#FF7A00] rounded z-10">
                     Featured Piece
                   </span>
                 </div>
@@ -123,7 +133,7 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. THE 6 CATEGORY TILES: Main Editorial Entry Point */}
+      {/* 2. THE 6 CATEGORY TILES: Main Editorial Entry Point with Fixed 3:4 Aspect Ratio */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
           <div>
@@ -139,51 +149,52 @@ export const Home: React.FC = () => {
           </p>
         </div>
 
-        {/* Editorial Asymmetric Grid */}
+        {/* Editorial Grid with Fixed 3:4 Aspect Ratio for Category Tiles */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat) => (
+          {categories.map((cat, idx) => (
             <Link
               key={cat.id}
               to={cat.flow === 'room' ? `/collections/${cat.slug}` : `/category/${cat.slug}`}
               className="group relative rounded-2xl overflow-hidden border-2 border-white/10 hover:border-[#FF7A00] transition-all duration-300 bg-[#0D0D0D] hard-shadow"
             >
-              {/* Category Image */}
-              <div className="aspect-[16/10] overflow-hidden relative">
-                <img
+              {/* Category Image: fixed 3:4 ratio */}
+              <div className="aspect-[3/4] overflow-hidden relative">
+                <SmartImage
                   src={cat.image}
                   alt={cat.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  itemTypeKeyword={cat.slug}
+                  lockIndex={idx + 1}
+                  priority={idx < 3}
+                  aspectRatioClass="h-full w-full"
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent pointer-events-none" />
 
                 {/* Number Badge */}
-                <span className="absolute top-4 left-4 font-serif text-sm tracking-widest text-white/70 font-mono">
+                <span className="absolute top-4 left-4 font-serif text-sm tracking-widest text-white/80 font-mono z-10">
                   {cat.number}
                 </span>
 
                 {/* Flow type indicator */}
-                <span className="absolute top-4 right-4 px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-black/60 backdrop-blur-md text-[#FFD3A1] rounded border border-white/10">
+                <span className="absolute top-4 right-4 px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-black/60 backdrop-blur-md text-[#FFD3A1] rounded border border-white/10 z-10">
                   {cat.flow === 'room' ? 'Style Gallery' : 'Configurator'}
                 </span>
-              </div>
 
-              {/* Title & Info */}
-              <div className="p-6 bg-[#0D0D0D] flex flex-col justify-between">
-                <div>
-                  <h3 className="font-serif text-2xl text-white group-hover:text-[#FF7A00] transition-colors mb-1.5 flex items-center justify-between">
+                {/* Bottom Overlay Info on Tile */}
+                <div className="absolute bottom-0 inset-x-0 p-6 z-10 flex flex-col justify-end bg-gradient-to-t from-black via-black/80 to-transparent">
+                  <h3 className="font-serif text-2xl text-white group-hover:text-[#FF7A00] transition-colors mb-1 flex items-center justify-between">
                     <span>{cat.name}</span>
                     <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-[#FF7A00] group-hover:translate-x-1 transition-all" />
                   </h3>
-                  <p className="text-xs text-white/60 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-white/70 line-clamp-2 leading-relaxed">
                     {cat.description}
                   </p>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-[#FFD3A1]">
-                  <span>{cat.itemCount}</span>
-                  <span className="text-[11px] font-medium text-[#FF7A00] group-hover:underline">
-                    Explore →
-                  </span>
+                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-[#FFD3A1]">
+                    <span>{cat.itemCount}</span>
+                    <span className="text-[11px] font-medium text-[#FF7A00] group-hover:underline">
+                      Explore Collection →
+                    </span>
+                  </div>
                 </div>
               </div>
             </Link>
@@ -195,17 +206,21 @@ export const Home: React.FC = () => {
       <section className="py-20 bg-gradient-to-b from-black via-[#141414] to-black border-y border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Tagged Room Preview */}
+            {/* Tagged Room Preview: 16:10 desktop, 4:5 mobile */}
             <div className="lg:col-span-7 relative rounded-2xl overflow-hidden border-2 border-white/15 shadow-2xl">
-              <img
-                src={featuredRoom.fullRoomImage}
-                alt={featuredRoom.title}
-                className="w-full aspect-[16/10] object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+              <div className="aspect-[4/5] sm:aspect-[16/10] w-full">
+                <SmartImage
+                  src={featuredRoom.fullRoomImage}
+                  alt={featuredRoom.title}
+                  itemTypeKeyword="livingroom"
+                  aspectRatioClass="h-full w-full"
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
 
               {/* Hotspot indicator samples */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-[#FF7A00] text-xs text-white shadow-xl animate-bounce">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-[#FF7A00] text-xs text-white shadow-xl animate-bounce z-10">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#FF7A00]" />
                 <span>Interactive Hotspots Active</span>
               </div>
@@ -269,8 +284,8 @@ export const Home: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {featuredProducts.map((p, idx) => (
+            <ProductCard key={p.id} product={p} priority={idx < 2} />
           ))}
         </div>
       </section>

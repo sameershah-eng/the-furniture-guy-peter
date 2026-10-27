@@ -7,6 +7,7 @@ import { products, Product } from '../data/products';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { HotspotDot } from '../components/HotspotDot';
 import { ProductCard } from '../components/ProductCard';
+import { SmartImage } from '../components/SmartImage';
 import { formatPrice, calculateBundleSavings } from '../utils/formatPrice';
 import { useStore } from '../store/useStore';
 
@@ -96,13 +97,18 @@ export const RoomLook: React.FC = () => {
           </button>
         </div>
 
-        {/* ================= STEP 3: FULL ROOM PHOTO WITH TAGGED HOTSPOTS ================= */}
+        {/* ================= STEP 3: FULL ROOM PHOTO WITH TAGGED HOTSPOTS (16:10 desktop, 4:5 mobile) ================= */}
         <div className="relative rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl bg-neutral-900 hard-shadow">
-          <img
-            src={room.fullRoomImage}
-            alt={room.title}
-            className="w-full aspect-[16/10] sm:aspect-[16/9] object-cover"
-          />
+          <div className="aspect-[4/5] sm:aspect-[16/10] w-full">
+            <SmartImage
+              src={room.fullRoomImage}
+              alt={room.title}
+              itemTypeKeyword={category.slug}
+              priority
+              aspectRatioClass="h-full w-full"
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
 
           {/* Overlay Gradient for legibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
@@ -114,7 +120,7 @@ export const RoomLook: React.FC = () => {
           })}
 
           {/* Bottom Floating Hint on Photo */}
-          <div className="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto flex items-center gap-2 p-3 bg-black/85 backdrop-blur-md rounded-xl border border-white/15 text-xs text-white max-w-md shadow-2xl">
+          <div className="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto flex items-center gap-2 p-3 bg-black/85 backdrop-blur-md rounded-xl border border-white/15 text-xs text-white max-w-md shadow-2xl z-20">
             <Sparkles className="w-4 h-4 text-[#FF7A00] shrink-0" />
             <span>
               Tap any <strong className="text-[#FF7A00]">+ pulsing dot</strong> on the photo to preview individual furniture pieces.

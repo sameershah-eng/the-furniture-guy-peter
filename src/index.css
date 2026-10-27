@@ -130,6 +130,53 @@
   content: '';
 }
 
+/* ================= CINEMATIC LOADER ANIMATIONS ================= */
+@keyframes drawArmchair {
+  0% {
+    stroke-dashoffset: 800;
+    opacity: 0.2;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.animate-draw-armchair {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: drawArmchair 1.0s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes wordReveal {
+  0% {
+    transform: translateY(115%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+.animate-word-reveal-1 {
+  animation: wordReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+}
+.animate-word-reveal-2 {
+  animation: wordReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.72s forwards;
+}
+.animate-word-reveal-3 {
+  animation: wordReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.84s forwards;
+}
+
+/* Subtle Film Grain Noise */
+.bg-film-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
 /* Print Invoice Styles */
 @media print {
   body * {

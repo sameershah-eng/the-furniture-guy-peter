@@ -11,7 +11,7 @@ interface ProductCardProps {
   priority?: boolean;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [quickAdded, setQuickAdded] = useState(false);
 
@@ -34,15 +34,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const primaryImage = product.images[0];
   const secondaryImage = product.images[1] || product.images[0];
+  const fallbackList = product.images.slice(1);
 
   return (
     <div
-      className="group relative flex flex-col bg-[#111111] border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-[#FF7A00]/50 hover:shadow-[0_12px_32px_rgba(255,122,0,0.12)]"
+      className="group relative flex flex-col bg-[#111111] border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#FF7A00]/50 hover:shadow-[0_12px_32px_rgba(255,122,0,0.12)]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image Container with Hover Crossfade */}
-      <Link to={`/product/${product.slug}`} className="relative block overflow-hidden aspect-[4/3] bg-neutral-900">
+      {/* Image Container with Fixed 4:5 Aspect Ratio */}
+      <Link to={`/product/${product.slug}`} className="relative block overflow-hidden aspect-[4/5] bg-neutral-900">
         {/* Primary Image */}
         <div
           className={`absolute inset-0 transition-opacity duration-500 ${
@@ -52,6 +53,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <SmartImage
             src={primaryImage}
             alt={product.name}
+            priority={priority}
+            fallbackUrls={fallbackList}
+            itemTypeKeyword={product.itemTypeKey || 'furniture'}
             aspectRatioClass="h-full w-full"
             fallbackTitle={product.name}
           />
@@ -66,6 +70,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <SmartImage
             src={secondaryImage}
             alt={`${product.name} alternate view`}
+            fallbackUrls={fallbackList}
+            itemTypeKeyword={product.itemTypeKey || 'furniture'}
             aspectRatioClass="h-full w-full"
             fallbackTitle={product.name}
           />
