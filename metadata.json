@@ -1,0 +1,6 @@
+{
+  "name": "The Furniture Guy - Luxury British Furniture",
+  "description": "Crafted for the way you live. Explore bespoke living room, dining room, bedroom collections, luxury sofas, and designer sets from our London showroom.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
